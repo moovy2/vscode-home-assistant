@@ -10,7 +10,6 @@ import {
   DeviceClassesSensor,
   IncludeList,
   Integer,
-  Port,
   PositiveInteger,
   StateClassesSensor,
   Template,
@@ -41,146 +40,9 @@ type Availability = {
   value_template?: Template;
 };
 
-export interface Schema {
-  /**
-   * Birth Message
-   * https://www.home-assistant.io/docs/mqtt/birth_will/#birth_message
-   */
-  birth_message?: {
-    /**
-     * The MQTT topic to publish the message.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#topic
-     */
-    topic?: string;
+export type Schema = Item | Item[];
 
-    /**
-     * The message content.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#payload
-     */
-    payload?: string;
-
-    /**
-     * The maximum QoS level of the topic.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#qos
-     */
-    qos?: QOS;
-
-    /**
-     * If the published message should have the retain flag on or not.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#retain
-     */
-    retain?: boolean;
-  };
-
-  /**
-   * The IP address or hostname of your MQTT broker, e.g., 192.168.1.32.
-   * https://www.home-assistant.io/docs/mqtt/broker#broker
-   */
-  broker?: string;
-
-  /**
-   * Path to the certificate file, e.g., /ssl/server.crt.
-   * https://www.home-assistant.io/docs/mqtt/broker#certificate
-   */
-  certificate?: string;
-
-  /**
-   * Client certificate, e.g., /home/user/owntracks/cookie.crt.
-   * https://www.home-assistant.io/docs/mqtt/certificate/#client_cert
-   */
-  client_cert?: string;
-
-  /**
-   * The client ID that Home Assistant will use. Has to be unique on the server. Default is a randomly generated one.
-   * https://www.home-assistant.io/docs/mqtt/broker#client_id
-   */
-  client_id?: string;
-
-  /**
-   * Client key, e.g., /home/user/owntracks/cookie.key.
-   * https://www.home-assistant.io/docs/mqtt/certificate/#client_key
-   */
-  client_key?: string;
-
-  /**
-   * The prefix for the discovery topic.
-   * https://www.home-assistant.io/docs/mqtt/discovery/#discovery_prefix
-   */
-  discovery_prefix?: string;
-
-  /**
-   * If the MQTT discovery should be enabled or not.
-   * https://www.home-assistant.io/docs/mqtt/discovery/#discovery
-   */
-  discovery?: boolean;
-
-  /**
-   * The time in seconds between sending keep alive messages for this client. Default is 60.
-   * https://www.home-assistant.io/docs/mqtt/broker#keepalive
-   *
-   * @min 15
-   */
-  keepalive?: PositiveInteger;
-
-  /**
-   * The corresponding password for the username to use with your MQTT broker.
-   * https://www.home-assistant.io/docs/mqtt/broker#password
-   */
-  password?: string;
-
-  /**
-   * The network port to connect to. Default is 1883.
-   */
-  port?: Port;
-
-  /**
-   * Protocol to use: 3.1 or 3.1.1. By default it connects with 3.1.1 and falls back to 3.1 if server does not support 3.1.1.
-   * https://www.home-assistant.io/docs/mqtt/broker#protocol
-   */
-  protocol?: "3.1" | "3.1.1";
-
-  /**
-   * Set the verification of the server hostname in the server certificate.
-   * https://www.home-assistant.io/docs/mqtt/broker#tls_insecure
-   */
-  tls_insecure?: boolean;
-
-  /**
-   * The username to use with your MQTT broker.
-   * https://www.home-assistant.io/docs/mqtt/broker#username
-   */
-  username?: string;
-
-  /**
-   * Will Message.
-   * https://www.home-assistant.io/docs/mqtt/birth_will/#will_message
-   */
-  will_message?: {
-    /**
-     * The MQTT topic to publish the message.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#topic
-     */
-    topic?: string;
-
-    /**
-     * The message content.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#payload
-     */
-    payload?: string;
-
-    /**
-     * The maximum QoS level of the topic.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#qos
-     */
-    qos?: QOS;
-
-    /**
-     * If the published message should have the retain flag on or not.
-     * https://www.home-assistant.io/docs/mqtt/birth_will/#retain
-     */
-    retain?: boolean;
-  };
-
+interface Item {
   /**
    * The mqtt alarm panel platform enables the possibility to control MQTT capable alarm panels. The Alarm icon will change state after receiving a new state from state_topic.
    * https://www.home-assistant.io/integrations/alarm_control_panel.mqtt/
@@ -237,6 +99,12 @@ export interface Schema {
    * https://www.home-assistant.io/integrations/humidifier.mqtt
    */
   humidifier?: any;
+
+  /**
+   * The mqtt image platform allows you to integrate the content of an image file sent through MQTT into Home Assistant as an image.
+   * https://www.home-assistant.io/integrations/image.mqtt
+   */
+  image?: ImageItem | ImageItem[] | IncludeList;
 
   /**
    * The mqtt light platform lets you control your MQTT enabled lights through one of the supported message schemas, default, json or template.
@@ -338,14 +206,24 @@ interface BaseItem {
    */
   device?: {
     /**
+     * A link to the webpage that can manage the configuration of this device. Can be either an http://, https:// or an internal homeassistant:// URL
+     */
+    configuration_url?: string;
+
+    /**
      * A list of connections of the device to the outside world as a list of tuples.
      */
     connections?: { [key: string]: string };
 
     /**
+     * The hardware version of the device.
+     */
+    hw_version?: string;
+
+    /**
      * A list of IDs that uniquely identify the device. For example a serial number.
      */
-    identifier?: string;
+    identifiers?: string | string[];
 
     /**
      * The manufacturer of the device.
@@ -358,9 +236,24 @@ interface BaseItem {
     model?: string;
 
     /**
+     * The model identifier of the device.
+     */
+    model_id?: string;
+
+    /**
      * The name of the device.
      */
     name?: string;
+
+    /**
+     * The serial number of the device.
+     */
+    serial_number?: string;
+
+    /**
+     * Suggest an area if the device isn’t in one yet.
+     */
+    suggested_area?: string;
 
     /**
      * The firmware version of the device.
@@ -1286,6 +1179,44 @@ export interface FanItem extends BaseItem {
   state_value_template?: Template;
 }
 
+export interface ImageItem extends BaseItem {
+  /**
+   * The name of the MQTT image.
+   * https://www.home-assistant.io/integrations/image.mqtt#name
+   */
+  name?: string;
+
+  /**
+   * The content type of an image data message received on image_topic.
+   * https://www.home-assistant.io/integrations/image.mqtt#content_type
+   */
+  content_type?: string;
+
+  /**
+   * The encoding of the image payloads received.
+   * https://www.home-assistant.io/integrations/image.mqtt#image_encoding
+   */
+  image_encoding?: string;
+
+  /**
+   * The MQTT topic to subscribe to receive the image payload of the image to be downloaded.
+   * https://www.home-assistant.io/integrations/image.mqtt#image_topic
+   */
+  image_topic?: string;
+
+  /**
+   * Defines a template to extract the image URL from a message received at url_topic.
+   * https://www.home-assistant.io/integrations/image.mqtt#url_template
+   */
+  url_template?: Template;
+
+  /**
+   * The MQTT topic to subscribe to receive an image URL.
+   * https://www.home-assistant.io/integrations/image.mqtt#url_topic
+   */
+  url_topic?: string;
+}
+
 export interface LightDefaultItem extends BaseItem {
   /**
    * The mqtt light platform with default schema lets you control your MQTT enabled lights. It supports setting brightness, color temperature, effects, flashing, on/off, RGB colors, transitions, XY colors and white values.
@@ -1894,6 +1825,12 @@ export interface NumberItem extends BaseItem {
    * https://www.home-assistant.io/integrations/number.mqtt#unit_of_measurement
    */
   unit_of_measurement?: string;
+
+  /**
+   * Defines a template to extract the value.
+   * https://www.home-assistant.io/integrations/number.mqtt#value_template
+   */
+  value_template?: Template;
 }
 
 export interface SelectItem extends BaseItem {

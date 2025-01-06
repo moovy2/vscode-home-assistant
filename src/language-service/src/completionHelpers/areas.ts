@@ -3,12 +3,11 @@ import {
   JSONWorkerContribution,
   JSONPath,
   CompletionsCollector,
-  Thenable,
 } from "vscode-json-languageservice";
 import { IHaConnection } from "../home-assistant/haConnection";
 
-export class ServicesCompletionContribution implements JSONWorkerContribution {
-  public static propertyMatches: string[] = ["service"];
+export class AreaCompletionContribution implements JSONWorkerContribution {
+  public static propertyMatches: string[] = ["area_id", "area"];
 
   constructor(private haConnection: IHaConnection) {}
 
@@ -16,7 +15,7 @@ export class ServicesCompletionContribution implements JSONWorkerContribution {
     resource: string,
     result: CompletionsCollector,
   ): Thenable<any> {
-    return Promise.reject();
+    return Promise.resolve(null);
   }
 
   public collectPropertyCompletions = async (
@@ -33,14 +32,16 @@ export class ServicesCompletionContribution implements JSONWorkerContribution {
     const currentNode = location[location.length - 1];
     const parentNode = location[location.length - 2]; // in case or arrays, currentNode is the indexer for the array position
     if (
-      !ServicesCompletionContribution.propertyMatches.some(
-        (x) => x === currentNode || x === parentNode,
+      !AreaCompletionContribution.propertyMatches.some(
+        (x) =>
+          x === currentNode ||
+          (!Number.isNaN(+currentNode) && x === parentNode),
       )
     ) {
       return;
     }
-    const servicesCompletions = await this.haConnection.getServiceCompletions();
-    servicesCompletions.forEach((c) => result.add(c));
+    const areaCompletions = await this.haConnection.getAreaCompletions();
+    areaCompletions.forEach((c) => result.add(c));
   };
 
   public collectValueCompletions = async (
@@ -50,14 +51,13 @@ export class ServicesCompletionContribution implements JSONWorkerContribution {
     result: CompletionsCollector,
   ): Promise<any> => {
     if (
-      !ServicesCompletionContribution.propertyMatches.some(
-        (x) => x === currentKey,
-      )
+      !AreaCompletionContribution.propertyMatches.some((x) => x === currentKey)
     ) {
       return;
     }
-    const servicesCompletions = await this.haConnection.getServiceCompletions();
-    servicesCompletions.forEach((c) => result.add(c));
+
+    const areaCompletions = await this.haConnection.getAreaCompletions();
+    areaCompletions.forEach((c) => result.add(c));
   };
 
   public getInfoContribution(
