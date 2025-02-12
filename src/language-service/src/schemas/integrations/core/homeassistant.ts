@@ -7,7 +7,6 @@ import {
   IncludeNamed,
   Integer,
   LanguageTags,
-  TemperatureUnit,
   TimeZone,
   UnitSystem,
 } from "../../types";
@@ -55,7 +54,7 @@ export interface Schema {
 
   /**
    * Customize entities matching a pattern.
-   * https://wwww.home-assistant.io/docs/configuration/customizing-devices/
+   * https://www.home-assistant.io/docs/configuration/customizing-devices/
    */
   customize_glob?: CoreCustomize | IncludeNamed;
 
@@ -144,7 +143,7 @@ export interface Schema {
    * "C" for Celsius, "F" for Fahrenheit.
    * https://www.home-assistant.io/docs/configuration/basic/#temperature_unit
    */
-  temperature_unit?: TemperatureUnit;
+  temperature_unit?: "C" | "F";
 }
 
 interface CoreCustomize {
@@ -196,7 +195,7 @@ interface CoreCustomizeItem {
 
   /**
    * Defines the units of measurement, if any. This will also influence the graphical presentation in the history visualization as continuous value. Sensors with missing unit_of_measurement are showing as discrete values.
-   * https://wwww.home-assistant.io/docs/configuration/customizing-devices/#unit_of_measurement
+   * https://www.home-assistant.io/docs/configuration/customizing-devices/#unit_of_measurement
    */
   unit_of_measurement?: string;
 }

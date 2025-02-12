@@ -99,6 +99,12 @@ interface BaseItem {
    * https://www.home-assistant.io/docs/automation/basics/
    */
   condition?: Condition | Condition[] | DynamicTemplate | IncludeList;
+
+  /**
+   * Conditions are optional tests that can limit an automation rule to only work in your specific use cases. A condition will test against the current state of the system. This includes the current time, devices, people and other things like the sun.
+   * https://www.home-assistant.io/docs/automation/basics/
+   */
+  conditions?: Condition | Condition[] | DynamicTemplate | IncludeList;
 }
 
 export interface AutomationItem extends BaseItem {
@@ -106,7 +112,13 @@ export interface AutomationItem extends BaseItem {
    * Triggers describe events that should trigger the automation rule.
    * https://www.home-assistant.io/docs/automation/basics/
    */
-  trigger: Trigger | Trigger[] | IncludeList;
+  trigger?: Trigger | Trigger[] | IncludeList;
+
+  /**
+   * Triggers describe events that should trigger the automation rule.
+   * https://www.home-assistant.io/docs/automation/basics/
+   */
+  triggers?: Trigger | Trigger[] | IncludeList;
 
   /**
    * Available in trigger templates with the difference that only limited templates can be used to pass a value to the trigger variable.
@@ -118,13 +130,19 @@ export interface AutomationItem extends BaseItem {
    * The action(s) which will be performed when a rule is triggered and all conditions are met. For example, it can turn a light on, set the temperature on your thermostat or activate a scene.
    * https://www.home-assistant.io/docs/automation/basics/
    */
-  action: Action | Action[] | IncludeList;
+  action?: Action | Action[] | IncludeList;
+
+  /**
+   * The action(s) which will be performed when a rule is triggered and all conditions are met. For example, it can turn a light on, set the temperature on your thermostat or activate a scene.
+   * https://www.home-assistant.io/docs/automation/basics/
+   */
+  actions?: Action | Action[] | IncludeList;
 }
 
 interface BlueprintItem extends BaseItem {
   use_blueprint: {
     path: string;
-    input: { [key: string]: any };
+    input?: { [key: string]: any };
   };
 
   /**
@@ -134,8 +152,20 @@ interface BlueprintItem extends BaseItem {
   trigger?: Trigger | Trigger[] | IncludeList;
 
   /**
+   * Triggers describe events that should trigger the automation rule.
+   * https://www.home-assistant.io/docs/automation/basics/
+   */
+  triggers?: Trigger | Trigger[] | IncludeList;
+
+  /**
    * The action(s) which will be performed when a rule is triggered and all conditions are met. For example, it can turn a light on, set the temperature on your thermostat or activate a scene.
    * https://www.home-assistant.io/docs/automation/basics/
    */
   action?: Action | Action[] | IncludeList;
+
+  /**
+   * The action(s) which will be performed when a rule is triggered and all conditions are met. For example, it can turn a light on, set the temperature on your thermostat or activate a scene.
+   * https://www.home-assistant.io/docs/automation/basics/
+   */
+  actions?: Action | Action[] | IncludeList;
 }

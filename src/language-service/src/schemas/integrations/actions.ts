@@ -5,10 +5,12 @@
 import {
   Area,
   Data,
-  Deprecated,
   Entities,
+  Floor,
   IncludeList,
   Integer,
+  Label,
+  LegacySyntax,
   SceneEntity,
   Template,
   TimePeriod,
@@ -26,6 +28,7 @@ export type Action =
   | RepeatAction
   | SceneAction
   | ServiceAction
+  | SequenceAction
   | StopAction
   | WaitForTriggerAction
   | WaitTemplateAction
@@ -179,11 +182,10 @@ export interface EventAction {
   event_data?: Data;
 
   /**
-   * DEPRECATED as of Home Assistant 0.115.
    * You can use templates directly in the event_data parameter, replace "event_data_template" with just "event_data".
    * https://www.home-assistant.io/docs/scripts/#fire-an-event
    */
-  event_data_template?: Deprecated;
+  event_data_template?: LegacySyntax;
 }
 
 export interface IfAction {
@@ -245,16 +247,7 @@ export interface ParallelAction {
    * The sequence of actions to run in parallel.
    * https://www.home-assistant.io/docs/scripts/#parallelizing-actions
    */
-  parallel:
-    | (
-        | {
-            sequence: Action | Action[] | IncludeList;
-          }
-        | Action
-        | Action[]
-        | IncludeList
-      )[]
-    | IncludeList;
+  parallel: (Action | Action[] | IncludeList)[] | IncludeList;
 }
 
 export interface RepeatAction {
@@ -342,6 +335,31 @@ export interface SceneAction {
   metadata?: any;
 }
 
+export interface SequenceAction {
+  /**
+   * Alias for the sequence action.
+   */
+  alias?: string;
+
+  /**
+   * Every individual action can be disabled, without removing it.
+   * https://www.home-assistant.io/docs/scripts/#disabling-an-action
+   */
+  enabled?: boolean;
+
+  /**
+   * Set it to true if you’d like to continue the action sequence, regardless of whether that action encounters an error.
+   * https://www.home-assistant.io/docs/scripts/#continuing-on-error
+   */
+  continue_on_error?: boolean;
+
+  /**
+   * The sequence of actions to run in serial
+   * https://www.home-assistant.io/docs/scripts/#grouping-actions
+   */
+  sequence: Action | Action[] | IncludeList;
+}
+
 export interface ServiceAction {
   /**
    * Service call alias.
@@ -362,30 +380,33 @@ export interface ServiceAction {
   continue_on_error?: boolean;
 
   /**
-   * The most important action is the action to call a service.
-   * https://www.home-assistant.io/docs/scripts/service-calls/
+   * Legacy syntax, use "action" instead.
    */
-  service?: string;
+  service?: LegacySyntax;
 
   /**
-   * DEPRECATED as of Home Assistant 0.115.
+   * The most important action is to call an action.
+   * https://www.home-assistant.io/docs/scripts/service-calls/
+   */
+  action?: string;
+
+  /**
    * You can use templates directly in the service parameter, replace "service_template" with just "service".
    * https://www.home-assistant.io/docs/scripts/service-calls/#use-templates-to-decide-which-service-to-call
    */
-  service_template?: Deprecated;
+  service_template?: LegacySyntax;
 
   /**
    * Specify other parameters beside the entity to target. For example, the light turn on service allows specifying the brightness.
    * https://www.home-assistant.io/docs/scripts/service-calls/#passing-data-to-the-service-call
    */
-  data?: Data;
+  data?: Data | Template;
 
   /**
-   * DEPRECATED as of Home Assistant 0.115.
    * You can use templates directly in the data parameter, replace "data_template" with just "data".
    * https://www.home-assistant.io/docs/scripts/service-calls/#use-templates-to-determine-the-attributes
    */
-  data_template?: Deprecated;
+  data_template?: LegacySyntax;
 
   /**
    * The entity (or entities) to execute this service call on.
@@ -416,6 +437,18 @@ export interface ServiceAction {
          * https://www.home-assistant.io/docs/scripts/service-calls
          */
         area_id?: Area | Area[] | "none";
+
+        /**
+         * The floor (or floors) to execute this service call on.
+         * https://www.home-assistant.io/docs/scripts/service-calls
+         */
+        floor_id?: Floor | Floor[] | "none";
+
+        /**
+         * The labels (or labels) to execute this service call on.
+         * https://www.home-assistant.io/docs/scripts/service-calls
+         */
+        label_id?: Label | Label[] | "none";
       }
     | Template;
 
@@ -423,6 +456,12 @@ export interface ServiceAction {
    * Additional data for merely for use with the frontend. Has no functional effect.
    */
   metadata?: any;
+
+  /**
+   * Add a response_variable to pass a variable of key/value pairs back to an automation or script.
+   * https://www.home-assistant.io/docs/scripts/service-calls/#use-templates-to-handle-response-data
+   */
+  response_variable?: string;
 }
 
 export interface StopAction {
@@ -449,6 +488,12 @@ export interface StopAction {
    * https://www.home-assistant.io/docs/scripts/#stopping-a-script-sequence
    */
   error?: boolean;
+
+  /**
+   * Add a response_variable to pass a variable of key/value pairs back to an automation or script
+   * https://www.home-assistant.io/docs/scripts/#stopping-a-script-sequence
+   */
+  response_variable?: string;
 }
 
 export interface WaitForTriggerAction {
